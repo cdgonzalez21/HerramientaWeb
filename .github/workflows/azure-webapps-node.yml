@@ -23,9 +23,9 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: HerramientaWeb     # Nombre de la aplicación en Azure
-  AZURE_WEBAPP_PACKAGE_PATH: '.'        # Ruta de tu proyecto, en este caso, la raíz del repositorio
-  NODE_VERSION: '20.x'                  # Versión de Node.js a usar
+  AZURE_WEBAPP_NAME: HerramientaWeb    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '20.x'                # set this to the node version to use
 
 permissions:
   contents: read
@@ -41,22 +41,37 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-    
     - name: Instalar dependencias para Headless Chrome
       run: |
         sudo apt-get update  
         sudo apt-get install -y libnss3 libatk-bridge2.0-0 libxcomposite1 libxrandr2 libgbm1
-
     - name: Azure login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Usar el secreto creado con las credenciales JSON
-    
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Usar el secreto creado
     - name: npm install, build, and test
       run: |
         npm install
         npm run build --if-present
         npm run test --if-present
+
+        # Paso 3: Configurar la versión de Node.js si estás trabajando con una aplicación Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+
+    # Paso 4: Desplegar en Azure WebApp
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: HerramientasWeb  # Nombre de tu aplicación Web en Azure
+        slot-name: production     # Nombre del slot (si usas slots en Azure)
+        package: .                # Ruta del paquete a desplegar (en este caso, la raíz del repositorio)
+      env:
+        AZURE_WEBAPP_NAME: HerramientasWeb  # Nombre de la aplicación Web en Azure
+        AZURE_WEBAPP_PACKAGE_PATH: .       # Ruta del código fuente a desplegar
+        NODE_VERSION: 20.x                 # Versión de Node.js (si es una app Node)
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v3
@@ -71,19 +86,12 @@ jobs:
     needs: build
     environment:
       name: 'Development'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
     - name: Download artifact from build job
       uses: actions/download-artifact@v3
       with:
         name: node-app
-
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        slot-name: 'production'    # Cambia si estás usando un slot diferente
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
 
     
