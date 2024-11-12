@@ -76,10 +76,11 @@ jobs:
       with:
         name: node-app
 
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
+    - name: Azure PowerShell script
+      uses: azure/powershell@v2
       with:
-        app-name: 'HerramientasWeb'  # Nombre de tu aplicación web en Azure
-        slot-name: 'production'  # (Opcional) Si usas slots
+          azPSVersion: "latest"
+          inlineScript: |
+            Get-AzContext
 
     
