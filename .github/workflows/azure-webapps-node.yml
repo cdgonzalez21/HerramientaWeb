@@ -76,12 +76,10 @@ jobs:
       with:
         name: node-app
 
-    - name: 'Deploy to Azure WebApp'
-      id: deploy-to-webapp
+    - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        app-name: 'HerramientasWeb'  # Nombre de tu aplicación web en Azure
+        slot-name: 'production'  # (Opcional) Si usas slots
 
     
