@@ -15,7 +15,7 @@ export class PlanoEdificioComponent implements OnInit {
  
   ngOnInit(): void {}
 
-  // Ejemplo de lógica para hacer clic en una sala
+  // Ejemplo de lógica para hacer clic en una salas
   onRoomClick(room: string) {
     alert(`Has hecho clic en la ${room}`);
   }
