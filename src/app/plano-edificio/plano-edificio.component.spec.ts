@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { PlanoEdificioComponent } from './plano-edificio.component';
 
 describe('PlanoEdificioComponent', () => {
@@ -8,7 +7,7 @@ describe('PlanoEdificioComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlanoEdificioComponent]
+      declarations: [PlanoEdificioComponent] // Cambiar imports a declarations
     })
     .compileComponents();
 
