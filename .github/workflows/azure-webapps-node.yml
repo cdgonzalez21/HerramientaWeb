@@ -23,9 +23,9 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: HerramientaWeb    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '20.x'                # set this to the node version to use
+  AZURE_WEBAPP_NAME: HerramientaWeb     # Nombre de la aplicación en Azure
+  AZURE_WEBAPP_PACKAGE_PATH: '.'        # Ruta de tu proyecto, en este caso, la raíz del repositorio
+  NODE_VERSION: '20.x'                  # Versión de Node.js a usar
 
 permissions:
   contents: read
@@ -41,14 +41,17 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+    
     - name: Instalar dependencias para Headless Chrome
       run: |
         sudo apt-get update  
         sudo apt-get install -y libnss3 libatk-bridge2.0-0 libxcomposite1 libxrandr2 libgbm1
+
     - name: Azure login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Usar el secreto creado
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Usar el secreto creado con las credenciales JSON
+    
     - name: npm install, build, and test
       run: |
         npm install
@@ -68,7 +71,6 @@ jobs:
     needs: build
     environment:
       name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
     - name: Download artifact from build job
@@ -76,11 +78,12 @@ jobs:
       with:
         name: node-app
 
-    - name: Azure PowerShell script
-      uses: azure/powershell@v2
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v2
       with:
-          azPSVersion: "latest"
-          inlineScript: |
-            Get-AzContext
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        slot-name: 'production'    # Cambia si estás usando un slot diferente
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
 
     
