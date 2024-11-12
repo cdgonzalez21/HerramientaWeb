@@ -55,24 +55,6 @@ jobs:
         npm run build --if-present
         npm run test --if-present
 
-        # Paso 3: Configurar la versión de Node.js si estás trabajando con una aplicación Node.js
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20.x'
-
-    # Paso 4: Desplegar en Azure WebApp
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: HerramientasWeb  # Nombre de tu aplicación Web en Azure
-        slot-name: production     # Nombre del slot (si usas slots en Azure)
-        package: .                # Ruta del paquete a desplegar (en este caso, la raíz del repositorio)
-      env:
-        AZURE_WEBAPP_NAME: HerramientasWeb  # Nombre de la aplicación Web en Azure
-        AZURE_WEBAPP_PACKAGE_PATH: .       # Ruta del código fuente a desplegar
-        NODE_VERSION: 20.x                 # Versión de Node.js (si es una app Node)
-
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v3
       with:
